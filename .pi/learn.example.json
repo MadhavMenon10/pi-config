@@ -1,0 +1,28 @@
+{
+  "//": "Point `vault` at your Obsidian vault. $LEARN_VAULT overrides it.",
+  "vault": "~/Obsidian",
+  "root": "Learning",
+  "folders": {
+    "sources": "Sources",
+    "cheatsheets": "Cheatsheets",
+    "maps": "Maps",
+    "sessions": "Sessions",
+    "gaps": "Gaps"
+  },
+  "stateDir": ".state",
+  "dashboard": "Dashboard.md",
+  "scheduler": {
+    "firstInterval": 1,
+    "secondInterval": 3,
+    "startingEase": 2.5,
+    "minEase": 1.3,
+    "maxEase": 2.8,
+    "maxInterval": 180,
+    "passScore": 0.7,
+    "coldFactor": 2,
+    "unquizzedNudgeDays": 3
+  },
+  "revealDuringProbe": false,
+  "dashboardOnStart": true,
+  "autoLogSessions": true
+}

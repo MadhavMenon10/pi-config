@@ -1,0 +1,4 @@
+# Local vault configuration — copy .pi/learn.example.json and edit
+.pi/learn.json
+
+node_modules/

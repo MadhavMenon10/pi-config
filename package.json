@@ -1,0 +1,24 @@
+{
+  "name": "pi-learn",
+  "version": "0.1.0",
+  "description": "Obsidian learning workflow for the pi coding agent: notes to cheatsheets, graded quizzing, active recall, spaced review, and knowledge-gap reports.",
+  "type": "module",
+  "keywords": [
+    "pi-package"
+  ],
+  "license": "MIT",
+  "pi": {
+    "extensions": [
+      ".pi/extensions"
+    ],
+    "skills": [
+      ".pi/skills"
+    ],
+    "prompts": [
+      ".pi/prompts"
+    ]
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types .pi/extensions/learn/selftest.ts"
+  }
+}
