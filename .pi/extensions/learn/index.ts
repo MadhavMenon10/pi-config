@@ -6,6 +6,7 @@ import { summarizeDue, writeDashboard } from "./dashboard.ts";
 import { registerGapTools } from "./gaps.ts";
 import { conceptStats, readLedger } from "./ledger.ts";
 import { SessionLog, renderMessage } from "./mdlog.ts";
+import { registerPlanTools } from "./plan-tools.ts";
 import { registerQuizTools } from "./quiz.ts";
 import { registerReview } from "./review.ts";
 import { actionable, dueTopics } from "./topics.ts";
@@ -46,6 +47,7 @@ already hold and stops starting above my head. Keep it short and keep it true.
  * Obsidian learning workflow for pi.
  *
  *   quiz / recall_free / recall_score  — graded questions, answered in a picker
+ *   learn_plan / learn_plan_update     — validated teaching DAG, drawn in mermaid
  *   learn_due / review_close           — spaced repetition over cheatsheets
  *   learn_gaps                         — per-concept accuracy from the ledger
  *   /due  /log  /learn                 — commands
@@ -69,6 +71,7 @@ export default function (pi: ExtensionAPI) {
   };
 
   registerQuizTools(pi, deps);
+  registerPlanTools(pi, deps);
   registerReview(pi, deps);
   registerGapTools(pi, config);
 

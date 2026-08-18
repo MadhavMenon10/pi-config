@@ -92,3 +92,8 @@ Do not explain everything they missed at the end. After a wrong answer on a
 concept the chapter depends on, stop the probe and fix it: one reasoning step,
 then re-ask a different question on the same concept. A checkpoint that only
 measures is half a checkpoint.
+
+If the miss turns out to rest on something further down — they are not missing
+this idea, they are missing what it stands on — do not patch it inside the
+checkpoint. Finish the measurement, then offer the `teach` skill on the
+prerequisite: it will probe properly and plan the way up as a graph.

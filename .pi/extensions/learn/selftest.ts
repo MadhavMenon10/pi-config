@@ -15,8 +15,19 @@ import { loadConfig } from "./config.ts";
 import { renderDashboard, summarizeDue } from "./dashboard.ts";
 import { appendRecall, conceptStats, readLedger, scoreOf } from "./ledger.ts";
 import { applyReview, stateFromFrontmatter, stateToFrontmatter } from "./scheduler.ts";
+import {
+  type Plan,
+  nextTeachable,
+  parsePlan,
+  progressLine,
+  promoteReachable,
+  renderMermaid,
+  renderPlan,
+  validatePlan,
+  writePlan,
+} from "./plan.ts";
 import { dueTopics, findTopic } from "./topics.ts";
-import { addDays, readNote, today, updateFrontmatter } from "./vault.ts";
+import { addDays, parseNote, readNote, today, updateFrontmatter } from "./vault.ts";
 
 const vault = mkdtempSync(join(tmpdir(), "learn-selftest-"));
 mkdirSync(join(vault, "Learning", "Cheatsheets"), { recursive: true });
@@ -138,5 +149,94 @@ const dashboard = renderDashboard(config);
 assert.ok(dashboard.includes("[[Learning/Cheatsheets/Differential Forms|Differential Forms]]"));
 assert.ok(dashboard.includes("## Never quizzed"));
 assert.ok(dashboard.includes("`wedge-product`"), "weak concepts are listed");
+
+/* ------------------------------------------------------------- teaching DAG */
+
+const basePlan = (): Plan => ({
+  topic: "differential-forms",
+  title: "Differential Forms",
+  goal: "Read Maxwell's equations written with differential forms.",
+  nodes: [
+    { id: "line-integral", label: "work along a curve", status: "known", deps: [] },
+    { id: "covector", label: "a machine that eats a vector", status: "edge", deps: ["line-integral"] },
+    { id: "one-form", label: "a covector at every point", status: "unknown", deps: ["covector"] },
+    { id: "wedge-product", label: "antisymmetric product", status: "unknown", deps: ["one-form"] },
+  ],
+  tail: "",
+});
+
+assert.deepEqual(validatePlan(basePlan()).errors, [], "a well-formed plan validates");
+
+const cyclic = basePlan();
+cyclic.nodes[1].deps = ["wedge-product"];
+assert.match(validatePlan(cyclic).errors.join(" "), /cycle/, "cycles are rejected");
+
+const dangling = basePlan();
+dangling.nodes[1].deps = ["pullback"];
+assert.match(validatePlan(dangling).errors.join(" "), /not in the plan/, "unknown deps are rejected");
+
+const coldOpen = basePlan();
+coldOpen.nodes[0].status = "unknown";
+const coldIssues = validatePlan(coldOpen);
+assert.deepEqual(coldIssues.errors, [], "a cold open is a warning, not a hard error");
+assert.match(
+  coldIssues.warnings.join(" "),
+  /starts at .*line-integral/,
+  "starting from unknown ground is flagged",
+);
+
+const duplicate = basePlan();
+duplicate.nodes.push({ id: "covector", label: "again", status: "edge", deps: [] });
+assert.match(validatePlan(duplicate).errors.join(" "), /Duplicate node id/, "duplicate ids are rejected");
+
+const promoted = promoteReachable({
+  ...basePlan(),
+  nodes: basePlan().nodes.map((node) =>
+    node.id === "covector" ? { ...node, status: "locked" as const } : node,
+  ),
+});
+assert.equal(
+  promoted.nodes.find((node) => node.id === "one-form")?.status,
+  "edge",
+  "locking a node promotes what it unblocks",
+);
+assert.equal(
+  promoted.nodes.find((node) => node.id === "wedge-product")?.status,
+  "unknown",
+  "nodes two steps out stay unreachable",
+);
+assert.equal(nextTeachable(promoted)?.id, "one-form");
+assert.equal(progressLine(promoted), "1/3 nodes locked");
+
+const mermaid = renderMermaid(basePlan());
+assert.ok(mermaid.includes("flowchart TD"));
+assert.ok(mermaid.includes(":::known") && mermaid.includes(":::edge"));
+assert.ok(mermaid.includes("n0 --> n1"), "edges follow dependencies");
+
+const planPathWritten = writePlan(config, basePlan());
+const reparsed = parsePlan(parseNote(planPathWritten, renderPlan(basePlan())), "Differential Forms");
+assert.equal(reparsed.topic, "differential-forms");
+assert.equal(reparsed.goal, basePlan().goal);
+assert.deepEqual(
+  [...reparsed.nodes].map((node) => node.id).sort(),
+  ["covector", "line-integral", "one-form", "wedge-product"],
+  "every node survives the round trip",
+);
+assert.deepEqual(
+  reparsed.nodes.find((node) => node.id === "wedge-product")?.deps,
+  ["one-form"],
+  "dependencies survive the round trip",
+);
+assert.equal(
+  reparsed.nodes.find((node) => node.id === "line-integral")?.status,
+  "known",
+  "statuses survive the round trip",
+);
+
+const withNotes = renderPlan({ ...basePlan(), tail: "## Notes\n\nAsk about orientation." });
+assert.ok(
+  parsePlan(parseNote(planPathWritten, withNotes), "Differential Forms").tail.includes("orientation"),
+  "notes written under the table survive a rewrite",
+);
 
 console.log(`ok — learning system self-test passed (${vault})`);

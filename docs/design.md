@@ -66,6 +66,28 @@ So `learn_due` marks a topic **cold** once it is well past its own interval,
 and `/recall` re-teaches the spine — cheatsheet only, no new material — before
 testing. The retrieval that follows is a real one.
 
+## The plan is validated, not just drawn
+
+`learn_plan` could have been a prompt instruction — "write a mermaid graph
+before teaching". It is a tool that rejects bad graphs instead, because the
+diagram is not really the point.
+
+A dependency graph is a claim with structure: these are the steps, this is what
+each rests on, this is where a person holding *that* can start. It is checkable
+in a way prose is not, and the checks — dangling dependencies, cycles, no entry
+point in held ground — are exactly the failures produced by a model that is
+pattern-matching its way through a subject rather than reasoning about it.
+Improvisation cannot pass, because improvisation is not having settled the
+order yet.
+
+`promoteReachable` is in code for the same reason. After each node locks, what
+becomes reachable is derived from the graph, not re-asserted by the model, so
+the plan cannot drift from what was actually taught.
+
+The node table is parsed back out of the note, so the learner can edit it:
+marking something `known` in Obsidian is a valid way to say "skip this, I have
+it". The mermaid block is regenerated from the table, never the reverse.
+
 ## Recency-weighted concept accuracy
 
 `conceptStats` weights the last six attempts on a linear ramp rather than

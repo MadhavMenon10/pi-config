@@ -7,9 +7,9 @@ cheatsheets → graded checkpoints → spaced recall → knowledge-gap reports.
 
 | Path | What it is |
 |---|---|
-| `.pi/extensions/learn/` | The extension: `quiz`, `recall_free`, `recall_score`, `learn_due`, `review_close`, `learn_gaps`, and the `/due` `/log` `/learn` `/learn-init` commands |
-| `.pi/skills/` | `cheatsheet`, `checkpoint`, `recall`, `gaps`, `verify` |
-| `.pi/prompts/` | Short aliases: `/cheatsheet` `/checkpoint` `/recall` `/gaps` |
+| `.pi/extensions/learn/` | The extension: `quiz`, `recall_free`, `recall_score`, `learn_plan`, `learn_plan_update`, `learn_due`, `review_close`, `learn_gaps`, and the `/due` `/log` `/learn` `/learn-init` commands |
+| `.pi/skills/` | `teach`, `cheatsheet`, `checkpoint`, `recall`, `gaps`, `verify` |
+| `.pi/prompts/` | Short aliases: `/teach` `/plan` `/cheatsheet` `/checkpoint` `/recall` `/gaps` |
 | `.pi/learn.example.json` | Config template. The real one is `.pi/learn.json` (gitignored) or `~/.pi/agent/learn.json` |
 | `docs/` | `workflow.md` (how to use it), `design.md` (why it is like this) |
 
@@ -22,7 +22,8 @@ cheatsheets → graded checkpoints → spaced recall → knowledge-gap reports.
 - Extension modules import `@earendil-works/pi-coding-agent` (types only),
   `typebox`, and `@earendil-works/pi-ai`; pi provides them at runtime. Keep the
   pure modules — `config`, `vault`, `ledger`, `scheduler`, `topics`,
-  `dashboard` — free of those imports so the self-test stays dependency-free.
+  `dashboard`, `plan` — free of those imports so the self-test stays
+  dependency-free. Tool registration lives beside them in `*-tools.ts`.
 - Relative imports carry the `.ts` extension. Keep it that way.
 
 ## Invariants worth not breaking
@@ -36,5 +37,11 @@ cheatsheets → graded checkpoints → spaced recall → knowledge-gap reports.
   decide whether a review passed.
 - Concept ids in a cheatsheet's `## Concepts` list are the join key between
   cheatsheets, the ledger, and gap reports. Renaming one orphans its history.
+- `validatePlan` is a gate, not a linter: a plan with a dangling dependency, a
+  cycle, or no entry point in held ground must be rejected and nothing written.
+  Weakening it turns the DAG back into decoration.
+- A plan note's `## Nodes` table is the state and the learner may edit it; the
+  mermaid block is regenerated from the table, never the reverse. Content below
+  the table is preserved verbatim.
 - Never write outside the configured vault's learning root, and never write at
   all when the vault path does not exist.

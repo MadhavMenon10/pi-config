@@ -60,5 +60,7 @@ keep dropping keeps returning until it does not.
 ### 5. Finish
 
 Three lines: what came back cleanly, what needed re-teaching, when each topic
-is next due. If a topic failed twice in a row, say the honest thing — the
-cheatsheet may be wrong for them, and rewriting it beats grinding it.
+is next due. If a topic failed twice in a row, say the honest thing — either
+the cheatsheet is wrong for them and rewriting it beats grinding it, or it was
+never really learned in the first place, in which case offer the `teach` skill
+rather than a third review.

@@ -40,7 +40,15 @@ flowchart LR
   V --> S
   S -->|"/gaps"| G["What to fix, with locations"]
   G --> R
+  G -->|"/teach"| T["Probe → validated DAG →<br/>one step at a time"]
+  T --> C
 ```
+
+When reading is not enough — a concept you cannot get from the page, or a
+prerequisite a gap report just surfaced — `/teach` runs the live tutoring loop:
+probe the edge of what you hold, draw the dependency graph, then teach one
+reasoning step at a time with a lock-in quiz after each. What it teaches
+becomes a cheatsheet, which puts it back into the same schedule.
 
 Everything lives in your Obsidian vault as plain Markdown. There is no hidden
 database: the cheatsheet's frontmatter *is* the schedule, and the ledger is one
@@ -86,6 +94,11 @@ Requires an interactive pi session (the quiz picker is a TUI dialog).
   → 72%. Solid: covector, pullback. Shaky: wedge-product (sign convention)
   → next review in 3 days, gap report written
 
+# for the part the book was no help with
+> /teach the wedge product, well enough to compute one
+  → probes what I hold, draws the graph, waits
+  → then one reasoning step, one lock-in question, repeat
+
 # eight days later, opening pi for anything at all
   ⚠ 1 topic overdue, worst by 5 days. Run /recall.
 
@@ -102,6 +115,8 @@ Requires an interactive pi session (the quiz picker is a TUI dialog).
 
 | Command | What it does |
 |---|---|
+| `/teach <goal>` | Live tutoring: probe → dependency graph → one reasoning step at a time |
+| `/plan <goal>` | Probe and draw the graph only — see what a concept will take before starting |
 | `/cheatsheet [note]` | Compress a longform note into a cheatsheet with concept ids |
 | `/checkpoint <topic>` | End-of-chapter quiz → score → gaps → next review scheduled |
 | `/recall [topic]` | Spaced review of whatever has gone stale, refreshing cold topics first |
@@ -119,6 +134,8 @@ Requires an interactive pi session (the quiz picker is a TUI dialog).
 | `quiz` | One graded multiple-choice question in an interactive picker. Shuffles options, appends "I don't know", grades against the key, records the result |
 | `recall_free` | Open, no-options recall — you type from memory, the agent grades it |
 | `recall_score` | Record the grade for a free answer |
+| `learn_plan` | Write the teaching DAG as a mermaid diagram — and reject it if it does not hold together |
+| `learn_plan_update` | Lock a node after its quiz passes, or insert a prerequisite when it fails |
 | `learn_due` | Topics due, overdue, or never quizzed, and which have gone cold |
 | `review_close` | Score the session, apply the schedule, write it into the cheatsheet |
 | `learn_gaps` | Per-concept accuracy and every miss, from the ledger |
@@ -127,6 +144,22 @@ The `quiz` tool exists because a quiz you answer in chat is one you can bluff.
 The picker makes you commit before you see whether you were right, "I don't
 know" is a first-class answer rather than a guess, and the option order is
 shuffled so the model cannot leak the answer by always putting it first.
+
+`learn_plan` exists for the same kind of reason. The graph is genuinely useful
+to look at — you can see the whole day's path, what you already hold, and what
+each step buys you before committing to any of it. But its other job is to stop
+the model improvising: the plan has to **validate**. Every dependency must name
+a node that exists, the graph must be acyclic, ids must be unique, and there
+must be a real starting point in ground you already hold. A graph that fails is
+rejected with the reason, and nothing is written. You cannot produce a valid
+dependency graph for a subject by pattern-matching your way through it — you
+have to have actually worked out the order, which is exactly the reasoning that
+gets skipped when an explanation is improvised a paragraph at a time.
+
+The plan note stays live: nodes flip to locked as their quizzes pass, anything
+newly reachable is promoted automatically, and a failed lock-in inserts the
+missing prerequisite into the graph where you can see it. You can also edit the
+table in Obsidian yourself — mark something `known` and the system believes you.
 
 ## Vault layout
 
@@ -138,7 +171,7 @@ shuffled so the model cannot leak the answer by always putting it first.
 ├── Cheatsheets/            compressed, quizzable, one per topic
 ├── Sessions/               transcript of every learning session, LaTeX rendered
 ├── Gaps/                   ranked gap reports
-├── Maps/                   diagrams and dependency graphs
+├── Maps/                   teaching plans (live mermaid DAGs) and diagrams
 └── .state/recall.jsonl     append-only answer history
 ```
 
@@ -192,10 +225,14 @@ See [docs/workflow.md](docs/workflow.md) for the day-to-day workflow and
 
 ## Credit
 
-The method — probe the edge, plan, teach one step, lock it in with a quiz —
-is Eero Alvar's, from [*How I Use AI to Learn
-Things*](https://www.youtube.com/watch?v=kzcI5F4tGiU). This repo applies it to
-reading and retention rather than live tutoring, and adds compression, spaced
-review, and gap analysis on top. The `quiz` tool is named to match what
-[Alvarmethod](https://github.com/vasanthsreeram/Alvarmethod)'s `teach` skill
-expects on pi, so the two work together.
+The method — probe the edge, plan as a graph, teach one step, lock it in with a
+quiz — is Eero Alvar's, from [*How I Use AI to Learn
+Things*](https://www.youtube.com/watch?v=kzcI5F4tGiU). `/teach` and `/plan`
+implement that loop; the rest of this repo extends it to reading and retention,
+adding compression, spaced review, and gap analysis.
+
+The `quiz` tool is named to match what
+[Alvarmethod](https://github.com/vasanthsreeram/Alvarmethod) expects on pi, so
+its skills work against this harness too. Note that it also ships a skill
+called `teach` — pi keeps the first of a colliding name and warns, so install
+one or the other, not both.

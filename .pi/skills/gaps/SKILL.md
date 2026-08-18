@@ -72,5 +72,11 @@ tags:
 <declared on the cheatsheet, never asked>
 ```
 
-5. Report back in three lines and offer to run the drill now. Do not restate
-   the file into chat — it is in the vault, linked from the dashboard.
+5. Report back in three lines and offer to act on the top gap now:
+   - **shaky detail, terminology, procedure** → run the drill immediately.
+   - **missing prerequisite** → offer the `teach` skill on that prerequisite.
+     A drill on a step whose foundation is missing is wasted effort; the
+     teaching loop will probe, plan it as a graph, and build up to it.
+
+   Do not restate the file into chat — it is in the vault, linked from the
+   dashboard.

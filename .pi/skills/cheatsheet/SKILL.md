@@ -25,6 +25,9 @@ anything. The template is [assets/cheatsheet.md](assets/cheatsheet.md).
 - An argument that names a note, a chapter, or a file → find it under
   `Learning/Sources/` (search the vault; do not ask if a `read` would answer).
 - Pasted text or an open note → use that.
+- A `teach` session that just finished → the session note in
+  `Learning/Sessions/` and the plan in `Learning/Maps/` are the source. The
+  plan's node labels are already the concept list; keep those ids.
 - Nothing to go on → ask which note, once, and stop.
 
 Read `Learning/LEARNER.md` if it exists. It tells you what this person already

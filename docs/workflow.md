@@ -1,6 +1,7 @@
 # The workflow
 
-The system has four moments. You only ever have to know which one you are in.
+The system has four moments plus one detour. You only ever have to know which
+one you are in.
 
 ## 1. While reading — write badly, at length
 
@@ -75,6 +76,49 @@ checks what is due and tells you:
 Then targeted questions weighted toward the concepts you have actually been
 missing, and a `review_close` that pushes the topic out or pulls it back in.
 
+## The detour — `/teach` and `/plan`
+
+Reading does not always work. Some concepts you cannot get from the page, and
+some prerequisites only surface when a gap report finds them. That is what live
+tutoring is for.
+
+```
+/plan   understand gauge invariance      # probe + graph, no teaching
+/teach  the wedge product, well enough to compute one
+```
+
+Both start the same way — a probe, through the same picker, to find where your
+understanding actually ends rather than where you say it does. Then:
+
+**The graph.** `learn_plan` writes `Learning/Maps/<Topic>.md`: a mermaid
+dependency graph, plus a table of the same thing you can edit. Slate is what
+you already hold, amber is reachable now, grey rests on something not yet held,
+blue is where you are, green is locked in.
+
+Use `/plan` on its own when you want to see the shape of a subject before
+committing an afternoon to it — it answers "what am I actually going to have to
+learn here, and in what order" without teaching anything.
+
+The graph is also the anti-hallucination mechanism, which is why it is
+validated rather than merely drawn. Every dependency has to name a node that
+exists, the graph must be acyclic, ids must be unique, and there has to be a
+real starting point in ground you already hold. Fail any of those and the plan
+is rejected with the reason and nothing is written. Improvised teaching cannot
+produce a valid dependency graph, because improvisation is precisely the act of
+not having worked out the order yet.
+
+**Then one step at a time.** One reasoning step per turn, then a lock-in
+question through `quiz` — applied, not a definition. Pass and the node goes
+green and the next one opens. Fail and the missing prerequisite is inserted
+into the graph in front of you, and that is what gets taught next.
+
+You can interrupt at any point. A question mid-step is not a derailment; if it
+turns out to be a hole in the graph, it gets inserted as a node.
+
+**Close the loop.** A lesson that never becomes a cheatsheet is a lesson you
+lose in three weeks, so `/teach` ends by offering to compress the session into
+one. From there it is an ordinary topic: quizzed, scheduled, tracked.
+
 ## Between the four — `/gaps`
 
 ```
@@ -93,6 +137,7 @@ action with a location.
 |---|---|
 | `Sources/` — longform notes | `Cheatsheets/` — compressed, with the schedule in frontmatter |
 | `LEARNER.md` — what you already hold | `Sessions/` — every learning session, LaTeX rendered |
+| plan node statuses, if you disagree | `Maps/` — live teaching plans as mermaid graphs |
 | corrections to any of it | `Gaps/` — current gap reports |
 | | `Dashboard.md` — what is due, what is weak |
 | | `.state/recall.jsonl` — append-only answer history |
