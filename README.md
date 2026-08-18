@@ -1,4 +1,4 @@
-# pi-config — an Obsidian learning system for the pi agent
+# pi-config
 
 A [pi](https://pi.dev) configuration that turns reading into retained
 knowledge: longform notes get compressed into cheatsheets, chapters end in a
